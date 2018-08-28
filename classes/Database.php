@@ -50,7 +50,59 @@ class Database
         return $this;
     }
 
+    public  function action($action,$table,$where = array()) {
+        if(count($where) === 3) {
+            $operators = array('=' , '<' , '>' , '<=' , '>=');
+
+            $field = $where[0];
+            $operator = $where[1];
+            $value = $where[2];
+
+            if(in_array($operator, $operators)) {
+                $sql = "{$action} * FROM `{$table}` WHERE `{$field}` {$operator} '{$value}' ";
+                if(!$this->query($sql, array($value))->error() ) {
+                    return $this;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function insert($table,$fields = array() ) {
+        if(count($fields)) {
+            $keys = array_keys($fields);
+            $values=array_values($fields);
+            $x = 1;
+
+            $sql = "INSERT INTO `User` (`". implode('`, `' , $keys ) ."`) VALUES (".implode(",",$values ).")";
+            echo $sql;
+        }
+        return false;
+    }
+
+    public function update($table,$set = array() , $where = array() ) {
+
+    }
+
+    public function get($table,$where) {
+        return $this->action("SELECT", $table , $where);
+    }
+
+    public function delete($table,$where) {
+        return $this->action('DELETE', $table , $where);
+    }
+    public function first() {
+        return $this->results()[0];
+    }
+    public function results() {
+        return $this->_results;
+    }
+
     public function error() {
         return $this->_error;
+    }
+
+    public function count() {
+        return $this->_count;
     }
 }

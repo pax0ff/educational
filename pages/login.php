@@ -1,15 +1,12 @@
 <?php
-error_reporting(E_ALL);
+error_reporting(E_ALL | E_STRICT);
 require_once 'core/init.php';
-Database::getInstance();
-$user = Database::getInstance()->query("SELECT * FROM user");
+//Database::getInstance();
+$users = Database::getInstance()->insert('User',array(
+    'UserName' => 'stefan',
+    'Password' => 'New pass'
+));
 
-if($user) {
-    echo "Error";
-}
-else {
-    echo 'OK!';
-}
 ?>
 
 <!DOCTYPE html>
