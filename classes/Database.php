@@ -14,7 +14,7 @@ class Database
         try {
            $this->_pdo = new PDO('mysql:host=' . Config::get('mysql/host') . ';port=8889;dbname=' .Config::get('mysql/db_name'),Config::get('mysql/username'),Config::get('mysql/password'));
 
-            echo 'Connected';
+            //echo 'Connected';
         } catch(PDOException $e) {
             echo $e->getMessage();
         }
@@ -71,17 +71,50 @@ class Database
     public function insert($table,$fields = array() ) {
         if(count($fields)) {
             $keys = array_keys($fields);
-            $values=array_values($fields);
+            $values=null;
             $x = 1;
-
-            $sql = "INSERT INTO `User` (`". implode('`, `' , $keys ) ."`) VALUES (".implode(",",$values ).")";
+            foreach($fields as $field) {
+                $values.= '?';
+                if($x < count($fields)) {
+                    $values .= ', ';
+                }
+                $x++;
+            }
+            //die($values);
+            $sql = "INSERT INTO `User` (`". implode('`, `' , $keys ) ."`) VALUES ({$values})";
+            if(!$this->query($sql,$fields)->error()) {
+                return true;
+                
+            }
             echo $sql;
         }
         return false;
     }
 
-    public function update($table,$set = array() , $where = array() ) {
+    /**
+     * @param $table
+     * @param $id
+     * @param $fields
+     * @return bool
+     */
+    public function update($table, $id, $fields) {
+        $set='';
+        $x = 1;
 
+        foreach($fields as $name => $value) {
+            $set .= "{$name} = ?";
+            if($x < count($fields)) {
+                $set .= ', ';
+            } 
+            $x++;
+        }
+        //die($set);
+
+        $sql =  "UPDATE {$table} SET {$set} WHERE id = {$id}";
+        if(!$this->query($sql,$fields)->error()) {
+            return true;
+        }
+        return false;
     }
 
     public function get($table,$where) {

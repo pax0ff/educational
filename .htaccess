@@ -1,0 +1,13 @@
+RewriteEngine On
+
+RewriteRule ^register?$ pages/register.php
+
+RewriteRule ^login?$ pages/login.php
+
+RewriteRule ^home?$ index.php
+
+RewriteRule ^logout?$ pages/logout.php
+
+RewriteRule ^dashboard?$ pages/dashboard.php
+
+RewriteRule ^update?$ pages/update.php

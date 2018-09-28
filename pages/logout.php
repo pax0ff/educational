@@ -1,7 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: nor02
- * Date: 17/08/2018
- * Time: 11:28
- */
+require '../core/init.php';
+
+$user = new User();
+
+$user->logout();
+Redirect::to('home');

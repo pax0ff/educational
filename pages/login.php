@@ -1,11 +1,34 @@
 <?php
 error_reporting(E_ALL | E_STRICT);
-require_once 'core/init.php';
-//Database::getInstance();
-$users = Database::getInstance()->insert('User',array(
-    'UserName' => 'stefan',
-    'Password' => 'New pass'
-));
+require_once '../core/init.php';
+
+if(Input::exists()) {
+    if(Token::check(Input::get('token'))) {
+        $validate = new Validation();
+        $validation = $validate->check($_POST,array(
+                'username' => array('required' => true),
+                'password' => array('required' => true)
+        ));
+
+        if($validation->passed()) {
+            $user = new User();
+            $login = $user->login(Input::get('username'),Input::get('password'));
+
+            if($login) {
+                Redirect::to('home');
+            }
+            else {
+                echo 'Login failed';
+            }
+        }
+        else {
+            foreach ($validation->errors() as $error) {
+                echo $error . '<br>';
+            }
+        }
+    }
+
+}
 
 ?>
 
@@ -21,7 +44,7 @@ $users = Database::getInstance()->insert('User',array(
     <link rel="stylesheet" type="text/css" href="assets/vendor/bootstrap/css/bootstrap.min.css">
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="assets/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
-    <!--===============================================================================================-->
+    <!--==============================================================================================-->
     <link rel="stylesheet" type="text/css" href="assets/fonts/iconic/css/material-design-iconic-font.min.css">
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="assets/vendor/animate/animate.css">
@@ -43,7 +66,7 @@ $users = Database::getInstance()->insert('User',array(
 <div class="limiter">
     <div class="container-login100">
         <div class="wrap-login100">
-            <form class="login100-form validate-form" method="POST" action="'.$auth'">
+            <form class="login100-form " method="POST" action="">
 					<span class="login100-form-title p-b-26" >
 						Welcome
 					</span>
@@ -51,19 +74,19 @@ $users = Database::getInstance()->insert('User',array(
 						<i class="zmdi zmdi-font"></i>
 					</span>
 
-                <div class="wrap-input100 validate-input" data-validate = "Enter username">
-                    <input class="input100" type="text" name="username">
+                <div class="wrap-input100 ">
+                    <input class="input100" type="text" name="username" autocomplete="off" value="<?php echo escape(Input::get('username'));?>">
                     <span class="focus-input100" data-placeholder="Username"></span>
                 </div>
 
-                <div class="wrap-input100 validate-input" data-validate="Enter password">
+                <div class="wrap-input100 v">
 						<span class="btn-show-pass">
 							<i class="zmdi zmdi-eye"></i>
 						</span>
-                    <input class="input100" type="password" name="pass">
+                    <input class="input100" type="password" name="password" autocomplete="off">
                     <span class="focus-input100" data-placeholder="Password"></span>
                 </div>
-
+                <input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
                 <div class="container-login100-form-btn">
                     <div class="wrap-login100-form-btn">
                         <div class="login100-form-bgbtn"></div>
@@ -78,7 +101,7 @@ $users = Database::getInstance()->insert('User',array(
 							Don’t have an account?
 						</span>
 
-                    <a class="txt2" href="#">
+                    <a class="txt2" href="register">
                         Sign Up
                     </a>
                 </div>
